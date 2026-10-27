@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10251e">
+  <meta name="description" content="Comprime, inspecciona y recupera archivos de texto con el algoritmo de Huffman.">
+  <title>Huffman — Laboratorio voraz</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="#inicio"><span class="brand-mark">H</span> HUFFMAN <span class="brand-light">/ LABORATORIO</span></a><span class="course">ANÁLISIS DE ALGORITMOS · 2026B</span></header>
+  <main id="inicio">
+    <section class="hero">
+      <div class="eyebrow"><span class="pulse"></span> COMPRESIÓN DE TEXTO · HUFF v1</div>
+      <h1>Menos bits.<br><em>La misma historia.</em></h1>
+      <p class="hero-copy">Explora cómo una estrategia voraz convierte frecuencias en códigos, y códigos en un archivo que puedes abrir, inspeccionar y recuperar.</p>
+      <div class="flow"><span>01 ENTRADA</span><b>→</b><span>02 ANALIZAR</span><b>→</b><span>03 COMPRIMIR</span><b>→</b><span>04 VERIFICAR</span></div>
+    </section>
+
+    <section class="workspace" aria-label="Compresor Huffman">
+      <nav class="tabs" aria-label="Herramientas"><button class="tab active" data-panel="compressor">01 · Compresor</button><button class="tab" data-panel="inspector">02 · Inspector .huff</button><span class="tab-note">TODO SE PROCESA EN TU NAVEGADOR</span></nav>
+      <section class="panel" id="compressor">
+        <div class="input-grid">
+          <article class="card input-card"><div class="card-kicker">A · ARCHIVO LOCAL</div><h2>Elige un texto</h2><p>Selecciona un archivo .txt de tu equipo.</p>
+            <label class="dropzone" id="dropzone"><input id="file-input" type="file" accept=".txt,text/plain"><span class="upload-icon">↑</span><strong>Suelta tu archivo aquí</strong><span>o <u>explora el equipo</u> · TXT</span></label>
+            <div class="selected-file" id="selected-file">Ningún archivo seleccionado</div>
+          </article>
+          <article class="card input-card gutenberg-card"><div class="card-kicker">B · BIBLIOTECA ABIERTA</div><h2>Busca en Gutenberg</h2><p>Encuentra una obra por título, autor o palabra clave.</p>
+            <form id="search-form" class="search-row"><input id="book-query" type="search" placeholder="Ej. Cervantes, Frankenstein…" aria-label="Buscar libro"><button class="button button-dark" type="submit">Buscar ↗</button></form>
+            <div id="book-results" class="book-results"><span class="muted">Los resultados aparecerán aquí.</span></div>
+            <label class="checkline"><input type="checkbox" id="strip-license" checked> Omitir encabezado y licencia de Gutenberg</label>
+          </article>
+        </div>
+
+        <article class="card work-card">
+          <div class="section-heading"><div><div class="card-kicker">01 — PREPARA Y ANALIZA</div><h2>Tu texto de entrada</h2></div><span class="meta-pill" id="source-meta">Esperando un archivo</span></div>
+          <textarea id="source-text" placeholder="Carga un .txt o selecciona un libro para comenzar…" spellcheck="false" aria-label="Texto de entrada"></textarea>
+          <div class="action-row"><div class="encoding-status" id="encoding-status">Compatible con UTF-8 y Latin-1</div><button class="button button-outline" id="analyze-button" disabled>Analizar texto</button><button class="button button-primary" id="build-button" disabled>Construir árbol y comprimir <span>→</span></button></div>
+          <div class="alert" id="app-alert" role="status" aria-live="polite"></div>
+        </article>
+
+        <section class="results" id="analysis-results" hidden>
+          <div class="metrics-grid" id="metrics"></div>
+          <div class="visual-grid">
+            <article class="card"><div class="section-heading"><div><div class="card-kicker">ESTRUCTURA VORAZ</div><h2>Árbol de Huffman</h2></div><span class="legend"><i></i> hojas <i class="blue-dot"></i> nodos</span></div><div class="tree-wrap" id="tree-view"><div class="empty-tree">El árbol aparecerá al analizar el texto.</div></div><div class="tree-caption">En cada iteración se fusionan los dos nodos de menor frecuencia.</div></article>
+            <article class="card"><div class="card-kicker">CÓMO SE FORMÓ</div><h2>Fusiones voraces</h2><div class="steps-list" id="merge-steps"></div></article>
+          </div>
+          <article class="card table-card"><div class="section-heading"><div><div class="card-kicker">DISTRIBUCIÓN Y CÓDIGOS</div><h2>Tabla de símbolos</h2></div><span id="symbol-count" class="meta-pill"></span></div><div class="table-scroll"><table><thead><tr><th>SÍMBOLO</th><th>UNICODE</th><th>FRECUENCIA</th><th>PROPORCIÓN</th><th>CÓDIGO HUFFMAN</th><th>BITS</th></tr></thead><tbody id="frequency-rows"></tbody></table></div></article>
+          <article class="success-card" id="compression-success" hidden><div class="success-icon">✓</div><div><strong>Archivo Huffman listo</strong><p>El archivo independiente incluye metadatos, tabla de frecuencias y datos empaquetados.</p></div><button id="download-huff" class="button button-light">Descargar .huff ↓</button><button id="verify-current" class="button button-success-outline">Verificar recuperación</button></article>
+          <article class="card recovered-card" id="current-recovery" hidden><div class="section-heading"><div><div class="card-kicker">COMPROBACIÓN DE INTEGRIDAD</div><h2 id="integrity-title">Pendiente</h2></div><button id="download-recovered" class="button button-outline">Descargar recuperado.txt ↓</button></div><p id="integrity-detail"></p></article>
+        </section>
+      </section>
+
+      <section class="panel inspector-panel" id="inspector" hidden>
+        <article class="card inspector-intro"><div><div class="card-kicker">ABRE SOLO EL ARCHIVO COMPRIMIDO</div><h2>¿Qué guarda un .huff?</h2><p>El inspector lee la cabecera, reconstruye el árbol y muestra los bits. No revela el texto hasta que pulses descomprimir.</p></div><label class="button button-primary file-button">Abrir archivo .huff <input id="huff-input" type="file" accept=".huff,application/octet-stream"></label></article>
+        <div id="inspector-content" hidden>
+          <div class="metrics-grid" id="inspect-metrics"></div>
+          <article class="card"><div class="section-heading"><div><div class="card-kicker">ESTRUCTURA DEL FORMATO</div><h2>Metadatos del archivo</h2></div><span class="meta-pill" id="inspect-name"></span></div><div class="metadata-grid" id="metadata"></div></article>
+          <div class="visual-grid"><article class="card"><div class="card-kicker">ÁRBOL RECONSTRUIDO</div><h2>Árbol de Huffman</h2><div class="tree-wrap" id="inspect-tree"></div></article><article class="card"><div class="card-kicker">SECUENCIA EMPAQUETADA</div><h2>Vista parcial de los bits</h2><div class="binary-view" id="binary-view"></div><p class="tree-caption">Vista de los primeros 256 bits válidos. El archivo completo conserva todos los bits.</p></article></div>
+          <article class="card table-card"><div class="section-heading"><div><div class="card-kicker">RECONSTRUIDA DESDE EL ARCHIVO</div><h2>Frecuencias y códigos</h2></div></div><div class="table-scroll"><table><thead><tr><th>SÍMBOLO</th><th>UNICODE</th><th>FRECUENCIA</th><th>PROPORCIÓN</th><th>CÓDIGO HUFFMAN</th><th>BITS</th></tr></thead><tbody id="inspect-rows"></tbody></table></div></article>
+          <article class="success-card"><div class="success-icon">↓</div><div><strong>Descompresión explícita</strong><p>Se recuperará el texto y se comprobará su tamaño y SHA-256.</p></div><button id="decompress-button" class="button button-light">Descomprimir archivo</button></article>
+          <article class="card recovered-card" id="inspect-recovery" hidden><div class="section-heading"><div><div class="card-kicker">TEXTO RECUPERADO</div><h2 id="inspect-integrity-title"></h2></div><button id="download-inspected" class="button button-outline">Descargar .txt ↓</button></div><p id="inspect-integrity-detail"></p><textarea id="recovered-text" readonly aria-label="Texto recuperado"></textarea></article>
+        </div>
+        <div id="inspector-empty" class="empty-inspector">Selecciona un archivo .huff para examinar su estructura.</div>
+      </section>
+    </section>
+    <footer><span>HUFFMAN LAB · PROYECTO ACADÉMICO 2026B</span><span>El algoritmo corre localmente · Los libros se solicitan a Gutendex / Project Gutenberg</span></footer>
+  </main>
+</body>
+</html>
+

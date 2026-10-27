@@ -1,0 +1,38 @@
+# Planeación inicial de la actividad
+
+Completar estos datos en reunión de equipo. El PDF pide que las tareas incluyan responsable, resultado esperado y estado; por eso las personas y enlaces se dejan pendientes de forma explícita.
+
+## Datos que debe acordar el equipo
+
+- Nombre del equipo: **pendiente**
+- Integrantes (máximo 4) y responsable de coordinación: **pendiente**
+- Repositorio GitHub: **pendiente**
+- GitHub Projects: **pendiente**
+- Tecnología: HTML, CSS y JavaScript en navegador; Python existente como referencia y pruebas.
+- Formato propuesto: `.huff`, firma `HUFF`, versión 1. Especificación en [formato-huff.md](formato-huff.md).
+- Boceto: encabezado oscuro y flujo guiado; panel de entrada (TXT/Gutenberg), análisis con tabla y árbol, mediciones y pestaña de inspector separado.
+- Reunión y acuerdos: **agregar fecha, participantes, decisiones y breve evidencia**.
+
+## Backlog para trasladar a GitHub Projects
+
+| Estado inicial | Tarea / resultado esperado | Responsable |
+| --- | --- | --- |
+| Terminado en código; pendiente de validar | Calcular frecuencias y fijar desempates reproducibles | Por asignar |
+| Terminado en código; pendiente de validar | Construir árbol voraz y tabla de códigos | Por asignar |
+| Terminado en código; pendiente de validar | Empaquetar bits y gestionar bits válidos del último byte | Por asignar |
+| Terminado en código; pendiente de validar | Documentar formato propio `.huff` y campos de cabecera | Por asignar |
+| Terminado en código; pendiente de validar | Recuperar archivo desde `.huff` y verificar tamaño/SHA-256 | Por asignar |
+| Terminado en código; pendiente de validar | Crear interfaz de entrada, métricas, tabla y visualización | Por asignar |
+| Terminado en código; pendiente de validar | Conectar búsqueda y descarga de Project Gutenberg | Por asignar |
+| Por hacer | Completar casos de prueba web, incluido TXT nuevo y Latin-1 | Por asignar |
+| Por hacer | Registrar capturas, medidas y evidencia de integridad | Por asignar |
+| Por hacer | Completar integrantes y reporte técnico breve PDF | Por asignar |
+| Por hacer | Publicar repo GitHub y configurar GitHub Projects | Por asignar |
+| Por hacer | Desplegar sitio estático gratis y agregar URL pública | Por asignar |
+
+En GitHub Projects, crear las columnas equivalentes a **Backlog → Por hacer → En progreso → En revisión → Terminado** y asignar una persona real a cada tarjeta. Las tareas listadas no sustituyen el historial de commits de cada integrante.
+
+## Plan de publicación gratuita
+
+La web es estática, por lo que GitHub Pages puede alojarla sin servidor ni base de datos. Para publicarla se necesita una cuenta GitHub con permiso sobre el repositorio: activar Pages desde la carpeta `Code_huffman/web/` (o copiar esos archivos a la raíz publicada), esperar la URL asignada y probar carga, descarga e inspector en esa URL HTTPS. La URL y capturas deben anotarse después de comprobarlas; no se ha publicado desde este entorno.
+
