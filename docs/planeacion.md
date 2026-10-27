@@ -6,8 +6,8 @@ Completar estos datos en reunión de equipo. El PDF pide que las tareas incluyan
 
 - Nombre del equipo: **pendiente**
 - Integrantes (máximo 4) y responsable de coordinación: **pendiente**
-- Repositorio GitHub: **pendiente**
-- GitHub Projects: **pendiente**
+- Repositorio GitHub: <https://github.com/sort-analytics/Tecnica-Voraz-Huffman>
+- GitHub Projects: [Backlog-Visualizador web de algoritmos](https://github.com/orgs/sort-analytics/projects/3), tablero existente de la organización con tareas de la actividad previa. Acordar con el equipo si se reutiliza y agregar allí las tareas Huffman con estado y responsable.
 - Tecnología: HTML, CSS y JavaScript en navegador; Python existente como referencia y pruebas.
 - Formato propuesto: `.huff`, firma `HUFF`, versión 1. Especificación en [formato-huff.md](formato-huff.md).
 - Boceto: encabezado oscuro y flujo guiado; panel de entrada (TXT/Gutenberg), análisis con tabla y árbol, mediciones y pestaña de inspector separado.
@@ -34,5 +34,5 @@ En GitHub Projects, crear las columnas equivalentes a **Backlog → Por hacer �
 
 ## Plan de publicación gratuita
 
-La web es estática, por lo que GitHub Pages puede alojarla sin servidor ni base de datos. Para publicarla se necesita una cuenta GitHub con permiso sobre el repositorio: activar Pages desde la carpeta `Code_huffman/web/` (o copiar esos archivos a la raíz publicada), esperar la URL asignada y probar carga, descarga e inspector en esa URL HTTPS. La URL y capturas deben anotarse después de comprobarlas; no se ha publicado desde este entorno.
+La web es estática, por lo que GitHub Pages puede alojarla sin servidor ni base de datos. El workflow está en `/.github/workflows/pages.yml`. Su primera ejecución falló al intentar habilitar el sitio: GitHub no permitió al token del workflow crear la configuración Pages. Una persona administradora debe seleccionar **GitHub Actions** en **Settings → Pages**; después se vuelve a ejecutar el workflow, se registra la URL HTTPS asignada y se verifica carga, descarga e inspector en la publicación.
 
