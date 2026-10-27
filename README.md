@@ -47,14 +47,14 @@ Casos mínimos de aceptación y evidencias requeridas están en [docs/pruebas.md
 ## Equipo y entrega
 
 - Equipo e integrantes: **pendiente de completar por el equipo**.
-- Repositorio GitHub: **pendiente de publicar/enlazar**.
-- GitHub Projects: **pendiente de crear y enlazar**.
-- URL pública: **pendiente de deployment**.
+- Repositorio GitHub: <https://github.com/sort-analytics/Tecnica-Voraz-Huffman>.
+- GitHub Projects: [Backlog-Visualizador web de algoritmos](https://github.com/orgs/sort-analytics/projects/3), proyecto previo visible de la organización; falta incorporar el backlog Huffman y acordar responsables con el equipo.
+- URL pública: **pendiente de activar GitHub Pages**. La primera ejecución falló porque el workflow no tiene permiso de organización para crear el sitio. Una persona administradora debe activar Pages para este repositorio y luego volver a ejecutar el workflow.
 - Reporte técnico PDF y evidencias: **pendientes de generar tras las pruebas reales**.
 
 La lista de trabajo inicial, campos de responsables y decisiones pendientes está en [docs/planeacion.md](docs/planeacion.md). No se deben presentar los enlaces o evidencias pendientes como si ya existieran.
 
-El workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) publica `Code_huffman/web/` en GitHub Pages al actualizar `main`, una vez que Pages esté habilitado para usar GitHub Actions en la configuración del repositorio. Después del primer deployment, agrega la URL real aquí y prueba el sitio público por HTTPS.
+El workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) publica `Code_huffman/web/` en GitHub Pages al actualizar `main`. Para resolver el bloqueo actual, una persona administradora debe ir a **Settings → Pages** del repositorio, seleccionar **GitHub Actions** como fuente y guardar. Después, vuelve a ejecutar el workflow desde **Actions**; agrega la URL que GitHub entregue y prueba el sitio público por HTTPS.
 
 ## Uso de IA y limitaciones
 
