@@ -49,16 +49,16 @@ Casos mínimos de aceptación y evidencias requeridas están en [docs/pruebas.md
 - Equipo e integrantes: **pendiente de completar por el equipo**.
 - Repositorio GitHub: <https://github.com/sort-analytics/Tecnica-Voraz-Huffman>.
 - GitHub Projects: [Backlog-Visualizador web de algoritmos](https://github.com/orgs/sort-analytics/projects/3), proyecto previo visible de la organización; falta incorporar el backlog Huffman y acordar responsables con el equipo.
-- URL pública: **pendiente de activar GitHub Pages**. La primera ejecución falló porque el workflow no tiene permiso de organización para crear el sitio. Una persona administradora debe activar Pages para este repositorio y luego volver a ejecutar el workflow.
+- Hosting: **Render Static Site**. La configuración Blueprint está en [`render.yaml`](render.yaml); publica `Code_huffman/web/` sin paso de compilación y se actualiza con cada commit a `main`.
+- URL pública: **pendiente de crear el servicio en Render**. Abre [New Static Site en Render](https://dashboard.render.com/select-repo?type=static), conecta `sort-analytics/Tecnica-Voraz-Huffman`, selecciona `main` y confirma la configuración detectada. Tras el primer deploy, copia aquí la URL `*.onrender.com` y verifica carga, compresión, descarga e inspector sobre HTTPS.
 - Reporte técnico PDF y evidencias: **pendientes de generar tras las pruebas reales**.
 
 La lista de trabajo inicial, campos de responsables y decisiones pendientes está en [docs/planeacion.md](docs/planeacion.md). No se deben presentar los enlaces o evidencias pendientes como si ya existieran.
 
-El workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) publica `Code_huffman/web/` en GitHub Pages al actualizar `main`. Para resolver el bloqueo actual, una persona administradora debe ir a **Settings → Pages** del repositorio, seleccionar **GitHub Actions** como fuente y guardar. Después, vuelve a ejecutar el workflow desde **Actions**; agrega la URL que GitHub entregue y prueba el sitio público por HTTPS.
+Render sirve el sitio estático desde su CDN con HTTPS y puede desplegarlo automáticamente al recibir commits en la rama conectada. No necesita servidor de aplicación, secretos ni paso de compilación. La búsqueda en Gutendex sí necesita conexión a Internet desde el navegador.
 
 ## Uso de IA y limitaciones
 
 IA generativa apoyó la extracción de requisitos, el diseño de interfaz, la implementación inicial y la documentación. El equipo debe validar los casos de prueba y comprender especialmente la cola de prioridad, el empaquetado de bits, los campos del archivo y la verificación SHA-256 antes de entregar.
 
 La interfaz necesita conexión para Gutendex y para descargar libros; la compresión e inspección del archivo `.huff` funcionan localmente. Se limita la entrada a 20 MiB por navegador. Huffman puede aumentar archivos pequeños o datos de alta entropía porque la cabecera y tabla tienen coste; las métricas muestran ese resultado real.
-
