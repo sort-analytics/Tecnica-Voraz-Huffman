@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: huffman-lab
+    runtime: static
+    rootDir: Code_huffman/web
+    buildCommand: echo "No build step required"
+    staticPublishPath: .
+    autoDeployTrigger: commit
