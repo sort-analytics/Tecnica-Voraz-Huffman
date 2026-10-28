@@ -9,6 +9,7 @@ Completar estos datos en reunión de equipo. El PDF pide que las tareas incluyan
 - Repositorio GitHub: <https://github.com/sort-analytics/Tecnica-Voraz-Huffman>
 - GitHub Projects: [Backlog-Visualizador web de algoritmos](https://github.com/orgs/sort-analytics/projects/3), tablero existente de la organización con tareas de la actividad previa. Acordar con el equipo si se reutiliza y agregar allí las tareas Huffman con estado y responsable.
 - Tecnología: HTML, CSS y JavaScript en navegador; Python existente como referencia y pruebas.
+- Hosting: Render Static Site, definido en `render.yaml`; despliega `Code_huffman/web/` desde la rama conectada.
 - Formato propuesto: `.huff`, firma `HUFF`, versión 1. Especificación en [formato-huff.md](formato-huff.md).
 - Boceto: encabezado oscuro y flujo guiado; panel de entrada (TXT/Gutenberg), análisis con tabla y árbol, mediciones y pestaña de inspector separado.
 - Reunión y acuerdos: **agregar fecha, participantes, decisiones y breve evidencia**.
@@ -28,11 +29,10 @@ Completar estos datos en reunión de equipo. El PDF pide que las tareas incluyan
 | Por hacer | Registrar capturas, medidas y evidencia de integridad | Por asignar |
 | Por hacer | Completar integrantes y reporte técnico breve PDF | Por asignar |
 | Por hacer | Publicar repo GitHub y configurar GitHub Projects | Por asignar |
-| Por hacer | Desplegar sitio estático gratis y agregar URL pública | Por asignar |
+| Por hacer | Desplegar sitio estático en Render, verificarlo y registrar URL pública | Por asignar |
 
 En GitHub Projects, crear las columnas equivalentes a **Backlog → Por hacer → En progreso → En revisión → Terminado** y asignar una persona real a cada tarjeta. Las tareas listadas no sustituyen el historial de commits de cada integrante.
 
 ## Plan de publicación gratuita
 
-La web es estática, por lo que GitHub Pages puede alojarla sin servidor ni base de datos. El workflow está en `/.github/workflows/pages.yml`. Su primera ejecución falló al intentar habilitar el sitio: GitHub no permitió al token del workflow crear la configuración Pages. Una persona administradora debe seleccionar **GitHub Actions** en **Settings → Pages**; después se vuelve a ejecutar el workflow, se registra la URL HTTPS asignada y se verifica carga, descarga e inspector en la publicación.
-
+La aplicación es un sitio estático: Render puede publicar directamente los archivos de `Code_huffman/web/` sin servidor ni base de datos. El Blueprint `render.yaml` fija la carpeta raíz, el paso de build sin compilación y el auto despliegue por commit. Falta crear el Static Site en el dashboard de Render, conectar el repositorio y la rama `main`, registrar la URL `*.onrender.com` y probar carga, compresión, descarga e inspector desde HTTPS.
