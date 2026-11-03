@@ -96,18 +96,131 @@
     if (count !== info.nchars || node !== info.root) throw new Error('El flujo binario terminó antes de completar el texto declarado.');
     return out.join('');
   }
-  function treeSVG(root) {
+  
+    function treeSVG(root) {
     if (!root) return '<div class="empty-tree">El texto no contiene símbolos.</div>';
     const leafCount = (n) => !n.left && !n.right ? 1 : leafCount(n.left) + leafCount(n.right);
-    const leaves = leafCount(root); if (leaves > 180) return `<div class="empty-tree">Árbol con ${leaves} hojas. La tabla completa de códigos está disponible abajo.</div>`;
-    const positions = new Map(); let index = 0, maxDepth = 0;
-    function layout(n, depth) { maxDepth = Math.max(maxDepth, depth); let x; if (!n.left && !n.right) x = index++ * 62 + 34; else x = (layout(n.left, depth + 1) + layout(n.right, depth + 1)) / 2; positions.set(n, [x, depth * 72 + 35]); return x; }
-    layout(root, 0); const width = Math.max(68, leaves * 62 + 12), height = Math.max(90, (maxDepth + 1) * 72 + 20), edges = [], nodes = [];
-    function draw(n) { const [x, y] = positions.get(n); if (n.left) { const [cx, cy] = positions.get(n.left); edges.push(`<line x1="${x}" y1="${y}" x2="${cx}" y2="${cy}"/><text x="${(x + cx) / 2 - 7}" y="${(y + cy) / 2}" class="bit">0</text>`); draw(n.left); } if (n.right) { const [cx, cy] = positions.get(n.right); edges.push(`<line x1="${x}" y1="${y}" x2="${cx}" y2="${cy}"/><text x="${(x + cx) / 2 + 7}" y="${(y + cy) / 2}" class="bit">1</text>`); draw(n.right); }
-      const leaf = !n.left && !n.right, label = leaf ? symbolLabel(n.symbol).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').slice(0, 8) : n.freq;
-      nodes.push(`<g><circle cx="${x}" cy="${y}" r="${leaf ? 18 : 15}" class="${leaf ? 'leaf' : 'inner'}"/><text x="${x}" y="${y + 4}" class="node-label">${label}</text>${leaf ? `<text x="${x}" y="${y + 31}" class="freq-label">${n.freq}</text>` : ''}</g>`);
+    const leaves = leafCount(root); 
+    
+    if (leaves > 400) return `<div class="empty-tree">Árbol con ${leaves} hojas. Demasiado grande para dibujar.</div>`;
+    
+    const positions = new Map(); 
+    let index = 0, maxDepth = 0;
+    const X_GAP = 60; 
+    const Y_GAP = 80; 
+
+    function layout(n, depth) { 
+      maxDepth = Math.max(maxDepth, depth); 
+      let x; 
+      if (!n.left && !n.right) x = index++ * X_GAP + 50; 
+      else x = (layout(n.left, depth + 1) + layout(n.right, depth + 1)) / 2; 
+      positions.set(n, [x, depth * Y_GAP + 50]); 
+      return x; 
     }
-    draw(root); return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Árbol binario de Huffman"><g class="edges">${edges.join('')}</g>${nodes.join('')}<style>.edges line{stroke:#aeb9b0;stroke-width:1.5}.bit{fill:#b9513b;font:600 10px 'DM Mono',monospace}.leaf{fill:#e6f5d8;stroke:#7fae51;stroke-width:1.5}.inner{fill:#e1eef5;stroke:#7eaac3;stroke-width:1.5}.node-label{text-anchor:middle;fill:#304137;font:600 9px 'DM Mono',monospace}.freq-label{text-anchor:middle;fill:#64736a;font:9px 'DM Sans',sans-serif}</style></svg>`;
+    
+    layout(root, 0); 
+    const width = Math.max(100, leaves * X_GAP + 100);
+    const height = Math.max(100, (maxDepth + 1) * Y_GAP + 100); 
+    const edges = [], nodes = [];
+    
+    function draw(n, parent = null) { 
+      const [x, y] = positions.get(n); 
+      if (n.left) { 
+        const [cx, cy] = positions.get(n.left); 
+        edges.push(`<line x1="${x}" y1="${y}" x2="${cx}" y2="${cy}" class="edge-line" data-child-id="${n.left.symbol || 'inner'}"/><text x="${(x + cx) / 2 - 8}" y="${(y + cy) / 2}" class="bit">0</text>`); 
+        draw(n.left, n); 
+      } 
+      if (n.right) { 
+        const [cx, cy] = positions.get(n.right); 
+        edges.push(`<line x1="${x}" y1="${y}" x2="${cx}" y2="${cy}" class="edge-line" data-child-id="${n.right.symbol || 'inner'}"/><text x="${(x + cx) / 2 + 8}" y="${(y + cy) / 2}" class="bit">1</text>`); 
+        draw(n.right, n); 
+      }
+      
+      const leaf = !n.left && !n.right;
+      const label = leaf ? symbolLabel(n.symbol).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').slice(0, 8) : n.freq;
+      const safeSym = leaf ? n.symbol.replace(/"/g, '&quot;') : '';
+      
+      nodes.push(`<g class="node-group" data-symbol="${safeSym}" data-code="${leaf ? generateCodes(n)[n.symbol] : ''}"><circle cx="${x}" cy="${y}" r="${leaf ? 20 : 16}" class="${leaf ? 'leaf' : 'inner'}"/><text x="${x}" y="${y + 5}" class="node-label">${label}</text>${leaf ? `<text x="${x}" y="${y + 32}" class="freq-label">${n.freq}</text>` : ''}</g>`);
+    }
+    
+    draw(root); 
+    
+    // Retornamos el SVG con atributos extra para el zoom
+    return `<svg id="huffman-svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="transform: scale(1); transform-origin: 0 0;">
+      <g class="edges">${edges.join('')}</g>
+      ${nodes.join('')}
+      <style>
+        .edge-line{stroke:#d1d5db;stroke-width:2;transition:stroke 0.3s, stroke-width 0.3s}
+        .edge-line.highlight{stroke:#f59e0b !important;stroke-width:4 !important}
+        .bit{fill:#b9513b;font:bold 12px 'DM Mono',monospace}
+        .leaf{fill:#dcfce7;stroke:#22c55e;stroke-width:2.5;transition:fill 0.3s}
+        .leaf.highlight{fill:#fef08a !important;stroke:#eab308 !important}
+        .inner{fill:#e0f2fe;stroke:#0ea5e9;stroke-width:2.5}
+        .node-label{text-anchor:middle;fill:#1f2937;font:bold 12px 'DM Mono',monospace}
+        .freq-label{text-anchor:middle;fill:#6b7280;font:11px 'DM Sans',sans-serif}
+      </style>
+    </svg>`;
+  }
+
+  // Función que activa el zoom, el arrastre y la búsqueda
+    function initTreeInteractions() {
+    const wrap = document.getElementById('tree-view');
+    const svg = document.getElementById('huffman-svg');
+    if (!wrap || !svg) return;
+
+    let scale = 1;
+    let translateX = 0;
+    let translateY = 0;
+    const step = 100; // Píxeles que se mueve con cada flecha
+
+    // Función que aplica la transformación
+    function applyTransform() {
+      svg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    }
+
+    // Zoom con la rueda del ratón
+    wrap.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.05 : 0.05;
+      scale = Math.max(0.2, Math.min(5, scale + delta));
+      applyTransform();
+    }, { passive: false });
+
+    // Movimiento con flechas
+    const btnLeft = document.getElementById('pan-left');
+    const btnRight = document.getElementById('pan-right');
+    const btnUp = document.getElementById('pan-up');
+    const btnDown = document.getElementById('pan-down');
+
+    if (btnLeft) btnLeft.addEventListener('click', () => { translateX += step; applyTransform(); });
+    if (btnRight) btnRight.addEventListener('click', () => { translateX -= step; applyTransform(); });
+    if (btnUp) btnUp.addEventListener('click', () => { translateY += step; applyTransform(); });
+    if (btnDown) btnDown.addEventListener('click', () => { translateY -= step; applyTransform(); });
+
+    // Búsqueda de nodo (lo dejamos igual)
+    const searchInput = document.getElementById('node-search');
+    const info = document.getElementById('node-info');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const val = e.target.value;
+        svg.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+        info.textContent = '';
+        if (!val) return;
+        
+        const targetNode = svg.querySelector(`[data-symbol="${val}"]`);
+        if (targetNode) {
+          targetNode.querySelector('.leaf')?.classList.add('highlight');
+          const code = targetNode.getAttribute('data-code');
+          info.textContent = `Letra: '${val}' | Código: ${code} | Bits: ${code.length}`;
+          const edges = svg.querySelectorAll('.edge-line');
+          edges.forEach(edge => {
+            if (edge.getAttribute('data-child-id') === val) edge.classList.add('highlight');
+          });
+        } else {
+          info.textContent = "Símbolo no encontrado";
+        }
+      });
+    }
   }
   function renderTable(freqs, codes, target) {
     const total = [...freqs.values()].reduce((a, b) => a + b, 0) || 1;
@@ -127,7 +240,7 @@
     if (!readTextArea()) return; state.frequencies = computeFrequencies(state.text); const steps = []; state.root = buildTree(state.frequencies, steps); state.codes = generateCodes(state.root);
     const original = state.raw || encoder.encode(state.text), bits = [...state.text].reduce((n, s) => n + (state.codes.get(s) || '').length, 0); $('analysis-results').hidden = false;
     $('metrics').innerHTML = metric('TAMAÑO ORIGINAL', formatBytes(original.length), `${original.length.toLocaleString('es-MX')} bytes`) + metric('DATOS CODIFICADOS', formatBytes(Math.ceil(bits / 8)), `${bits.toLocaleString('es-MX')} bits válidos`) + metric('SÍMBOLOS ÚNICOS', state.frequencies.size.toLocaleString('es-MX'), `${[...state.text].length.toLocaleString('es-MX')} símbolos en total`) + metric('LONGITUD MEDIA', `${(bits / Math.max(1, [...state.text].length)).toFixed(3)} bits`, 'por símbolo · referencia: 8 bits', true);
-    $('tree-view').innerHTML = treeSVG(state.root); const visibleSteps = steps.slice(0, 200); $('merge-steps').innerHTML = steps.length ? visibleSteps.map((s, i) => `<div class="step"><span class="step-n">${i + 1}</span><span class="step-text">${escapeHTML(nodeLabel(s.left))} (${s.left.freq}) + ${escapeHTML(nodeLabel(s.right))} (${s.right.freq}) → ${s.parent.freq}</span></div>`).join('') + (steps.length > visibleSteps.length ? `<div class="step-text">… ${steps.length - visibleSteps.length} fusiones adicionales omitidas en la vista.</div>` : '') : '<div class="muted">Solo hay un símbolo; se le asigna el código 0.</div>';
+    $('tree-view').innerHTML = treeSVG(state.root);     initTreeInteractions();const visibleSteps = steps.slice(0, 200); $('merge-steps').innerHTML = steps.length ? visibleSteps.map((s, i) => `<div class="step"><span class="step-n">${i + 1}</span><span class="step-text">${escapeHTML(nodeLabel(s.left))} (${s.left.freq}) + ${escapeHTML(nodeLabel(s.right))} (${s.right.freq}) → ${s.parent.freq}</span></div>`).join('') + (steps.length > visibleSteps.length ? `<div class="step-text">… ${steps.length - visibleSteps.length} fusiones adicionales omitidas en la vista.</div>` : '') : '<div class="muted">Solo hay un símbolo; se le asigna el código 0.</div>';
     renderTable(state.frequencies, state.codes, $('frequency-rows')); $('symbol-count').textContent = `${state.frequencies.size} símbolos`; setAlert('');
   }
   function nodeLabel(n) { return !n.left && !n.right ? `“${symbolLabel(n.symbol)}”` : 'nodo'; }
