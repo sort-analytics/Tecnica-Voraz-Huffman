@@ -6,9 +6,6 @@ import gutenberg
 PORT = 8000
 
 class LocalProxyHandler(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory="web", **kwargs)
-
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         if parsed.path == "/api/download":

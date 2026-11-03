@@ -1,7 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/download", "destination": "/api/download.py" },
-    { "source": "/", "destination": "/web/index.html" },
-    { "source": "/:path*", "destination": "/web/:path*" }
+    { "source": "/api/download", "destination": "/api/download.py" }
   ]
 }
