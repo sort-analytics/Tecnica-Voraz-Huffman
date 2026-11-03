@@ -1,29 +1,36 @@
-"""Búsqueda y descarga de libros de Project Gutenberg (API gratuita Gutendex)."""
+"""Búsqueda y descarga de libros de Project Gutenberg (API Gutendex)."""
 import json
 import re
 import urllib.parse
 import urllib.request
 
-UA = {"User-Agent": "HuffmanCompressor/1.0 (educational)"}
+UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) HuffmanCompressor/1.0"}
 
 
 def search(query):
     url = "https://gutendex.com/books/?search=" + urllib.parse.quote(query)
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=20) as r:
+    req = urllib.request.Request(url, headers=UA)
+    with urllib.request.urlopen(req, timeout=20) as r:
         data = json.load(r)
     results = []
     for b in data.get("results", []):
         fmts = b.get("formats", {})
-        txt = next((u for k, u in fmts.items() if k.startswith("text/plain") and "utf-8" in k), None) \
+        txt = (
+            next((u for k, u in fmts.items() if k.startswith("text/plain") and "utf-8" in k), None)
             or next((u for k, u in fmts.items() if k.startswith("text/plain")), None)
+            or f"https://www.gutenberg.org/cache/epub/{b['id']}/pg{b['id']}.txt"
+        )
         if txt:
+            txt = txt.replace("http://", "https://")
             authors = ", ".join(a["name"] for a in b.get("authors", [])) or "Anónimo"
             results.append(dict(id=b["id"], title=b["title"], author=authors, url=txt))
     return results
 
 
 def download(url):
-    with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
+    url = url.replace("http://", "https://")
+    req = urllib.request.Request(url, headers=UA)
+    with urllib.request.urlopen(req, timeout=60) as r:
         return r.read()
 
 

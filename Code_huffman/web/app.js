@@ -161,15 +161,48 @@
   function bookQuery(q) { return `https://gutendex.com/books/?search=${encodeURIComponent(q)}`; }
   async function searchBooks(event) {
     event.preventDefault(); const q = $('book-query').value.trim(); if (!q) return; const results = $('book-results'); results.textContent = 'Buscando obras…';
-    try { const response = await fetch(bookQuery(q)); if (!response.ok) throw new Error(`Respuesta HTTP ${response.status}`); const data = await response.json(); const books = (data.results || []).map(b => { const fmts = b.formats || {}; const url = fmts['text/plain; charset=utf-8'] || Object.entries(fmts).find(([k, v]) => k.startsWith('text/plain') && /\.txt(\.\d+)?$/i.test(v))?.[1]; return url ? { title: b.title, author: (b.authors || []).map(a => a.name).join(', ') || 'Anónimo', url, id: b.id } : null; }).filter(Boolean).slice(0, 8);
+    try { const response = await fetch(bookQuery(q)); if (!response.ok) throw new Error(`Respuesta HTTP ${response.status}`); const data = await response.json();
+      const books = (data.results || []).map(b => {
+        const fmts = b.formats || {};
+        const url = fmts['text/plain; charset=utf-8']
+          || fmts['text/plain']
+          || Object.entries(fmts).find(([k]) => k.startsWith('text/plain'))?.[1]
+          || `https://www.gutenberg.org/cache/epub/${b.id}/pg${b.id}.txt`;
+        return { title: b.title, author: (b.authors || []).map(a => a.name).join(', ') || 'Anónimo', url, id: b.id };
+      }).slice(0, 8);
       if (!books.length) { results.textContent = 'No hay resultados con texto plano disponible. Prueba con otra búsqueda.'; return; }
       results.replaceChildren(...books.map(book => { const row = document.createElement('div'); row.className = 'book-result'; const info = document.createElement('div'), title = document.createElement('strong'), author = document.createElement('span'), button = document.createElement('button'); title.textContent = book.title; author.textContent = book.author; button.textContent = 'Usar libro ↓'; button.addEventListener('click', () => loadBook(book)); info.append(title, author); row.append(info, button); return row; }));
     } catch (err) { results.textContent = 'No se pudo conectar con Gutendex. Revisa tu conexión y vuelve a intentar.'; }
   }
+
+  async function fetchBookBytes(book) {
+    const canonicalUrl = `https://www.gutenberg.org/cache/epub/${book.id}/pg${book.id}.txt`;
+    const targetUrl = book.url ? book.url.replace(/^http:/, 'https:') : canonicalUrl;
+    
+    // Petición al backend local en Python
+    const res = await fetch(`/api/download?url=${encodeURIComponent(targetUrl)}`);
+    if (!res.ok) throw new Error('No se pudo descargar la obra desde el servidor local.');
+    const buf = await res.arrayBuffer();
+    return new Uint8Array(buf);
+  }
+
   async function loadBook(book) {
     setAlert(''); $('book-results').setAttribute('aria-busy', 'true');
-    try { const response = await fetch(book.url); if (!response.ok) throw new Error('No se pudo descargar el texto.'); const raw = new Uint8Array(await response.arrayBuffer()); if (raw.length > MAX_FILE) throw new Error('El libro supera el límite de 20 MB para el navegador.'); let decoded = bytesToText(raw); if ($('strip-license').checked) { const start = /\*\*\*\s*START OF[^\n]*\*\*\*/i.exec(decoded.text), end = /\*\*\*\s*END OF/i.exec(decoded.text); if (start && end && end.index > start.index) decoded.text = decoded.text.slice(start.index + start[0].length, end.index).replace(/^\r?\n|\r?\n$/g, '') + '\n'; }
-      setSource(decoded.text, `gutenberg_${book.id}.txt`, null, 0); $('source-meta').textContent = `${[...decoded.text].length.toLocaleString('es-MX')} caracteres · obra ${book.id}`; document.querySelector('[data-panel="compressor"]').click(); $('source-text').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    try {
+      const raw = await fetchBookBytes(book);
+      if (raw.length > MAX_FILE) throw new Error('El libro supera el límite de 20 MB para el navegador.');
+      let decoded = bytesToText(raw);
+      if ($('strip-license').checked) {
+        const start = /\*\*\*\s*START OF[^\n]*\*\*\*/i.exec(decoded.text);
+        const end = /\*\*\*\s*END OF/i.exec(decoded.text);
+        if (start && end && end.index > start.index) {
+          decoded.text = decoded.text.slice(start.index + start[0].length, end.index).replace(/^\r?\n|\r?\n$/g, '') + '\n';
+        }
+      }
+      setSource(decoded.text, `gutenberg_${book.id}.txt`, null, 0);
+      $('source-meta').textContent = `${[...decoded.text].length.toLocaleString('es-MX')} caracteres · obra ${book.id}`;
+      document.querySelector('[data-panel="compressor"]').click();
+      $('source-text').scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch (err) { setAlert(err.message || 'No se pudo cargar la obra.'); } finally { $('book-results').removeAttribute('aria-busy'); }
   }
 
@@ -185,4 +218,3 @@
   $('decompress-button').addEventListener('click', async () => { try { const info = state.inspected; if (!info) return; const text = decode(info), recovered = textToBytes(text, info.encoding), expectedHash = info.sha, actualHash = await digest(recovered); const ok = recovered.length === info.origSize && actualHash.every((v, i) => v === expectedHash[i]); state.recovered = recovered; $('inspect-recovery').hidden = false; $('recovered-text').value = text; $('inspect-integrity-title').textContent = ok ? 'Integridad verificada · contenido recuperado' : 'Error de integridad'; $('inspect-integrity-detail').textContent = `${recovered.length.toLocaleString('es-MX')} bytes · SHA-256 ${ok ? 'coincide' : 'no coincide'} · contenido ${ok ? 'válido' : 'inválido'}.`; } catch (err) { $('inspect-integrity-title').textContent = 'No se pudo descomprimir'; $('inspect-integrity-detail').textContent = err.message; $('inspect-recovery').hidden = false; } });
   $('download-inspected').addEventListener('click', () => { if (state.recovered && state.inspected) download(new Blob([state.recovered], { type: 'text/plain' }), downloadName(state.inspected.name)); });
 })();
-
