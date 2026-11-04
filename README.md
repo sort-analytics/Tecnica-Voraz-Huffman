@@ -232,12 +232,16 @@ Una vez publicado el sitio, se debe verificar:
 
 ## 13. Organización del equipo
 
-- **Integrantes:** completar con los nombres reales.
-- **Repositorio:** https://github.com/sort-analytics/Tecnica-Voraz-Huffman
-- **GitHub Projects:** https://github.com/orgs/sort-analytics/projects/3
-- **Reporte técnico:** incorporar el PDF final cuando esté elaborado.
-- **Evidencias:** registrar capturas, resultados de las pruebas y verificaciones de integridad en el repositorio.
+Integrantes:
+López Olivera Alejandro Esaú
+Ramirez Perez Oscar Emiliano
+Rodriguez Hernandez Luis Giovanni
+Ruiz López Carlos Aarón
 
+Repositorio: https://github.com/sort-analytics/Tecnica-Voraz-Huffman
+GitHub Projects: https://github.com/orgs/sort-analytics/projects/3
+Reporte técnico: incorporar el PDF final cuando esté elaborado.
+Evidencias: registrar capturas, resultados de las pruebas y verificaciones de integridad en el repositorio.
 El tablero de GitHub Projects debe reflejar el estado real de cada tarea, su responsable y el resultado esperado.
 
 ## 14. Uso de inteligencia artificial
