@@ -1,0 +1,30 @@
+==================================================
+EVIDENCIA DE PRUEBAS Y FUNCIONAMIENTO
+Proyecto: Huffman Lab (Análisis de Algoritmos 2026B)
+==================================================
+
+1. PRUEBA 1: The Works of William Shakespeare (Vol. 8)
+--------------------------------------------------
+- Tamaño original: 1.37 MB (1,431,957 bytes)
+- Tamaño comprimido (.huff): 845.41 KB (865,698 bytes)
+- Espacio ahorrado: 552.99 KB
+- Razón de compresión: 1.654 : 1
+- Reducción: 39.54 %
+- Símbolos únicos: 119
+
+2. PRUEBA 2: The Adventures of Sherlock Holmes
+--------------------------------------------------
+- Tamaño original: 581.34 KB (595,295 bytes)
+- Tamaño comprimido (.huff): 323.17 KB (330,928 bytes)
+- Espacio ahorrado: 258.17 KB
+- Razón de compresión: 1.799 : 1
+- Reducción: 44.41 %
+- Símbolos únicos: 98
+
+3. VERIFICACIÓN DE INTEGRIDAD Y ÁRBOL
+--------------------------------------------------
+- Se generó correctamente el árbol de Huffman para ambos libros.
+- Se implementó navegación con zoom, flechas de desplazamiento y búsqueda de símbolos en el árbol.
+- La interfaz calcula correctamente las frecuencias y los códigos binarios.
+
+Nota: Este archivo sirve como registro técnico de las pruebas realizadas con textos de Project Gutenberg.
